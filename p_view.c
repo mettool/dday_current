@@ -2496,6 +2496,7 @@ void ClientEndServerFrame(edict_t* ent)
 
 	//faf
 	// Do Jump-Stamina increase
+	// DDay Chile values : Default values - ZeRo
 	if (ent->client->jump_stamina < JUMP_MAX)
 	{
 	

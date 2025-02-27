@@ -327,7 +327,6 @@ void InitGame(void)
 	player_scores = gi.cvar("player_scores", "1", 0);//faf
 
 	max_gibs = gi.cvar("max_gibs", "20", 0);//faf
-	extra_anims = gi.cvar("extra_anims", "1", 0);//faf
 	force_auto_select = gi.cvar("force_auto_select", "0", 0);//faf
 
 	allied_password = gi.cvar("allied_password", "", 0);
@@ -349,18 +348,27 @@ void InitGame(void)
 
 	mashup = gi.cvar("mashup", "0", 0);
 
-	fast_knife = gi.cvar("fast_knife", "0", 0);
-
 	chile = gi.cvar("chile", "1", CVAR_LATCH);
 	
+	if (chile->value) // ZeRo - If Chile is enabled, fast_knife is enabled by default. But it still can be disabled by the server operator if wanted.
+		fast_knife = gi.cvar("fast_knife", "1", 0);
+	else
+		fast_knife = gi.cvar("fast_knife", "0", 0);
+
 	if (chile->value) // ZeRo - If Chile is enabled, disable tired sway by default. But it still can be enabled by the server operator if wanted.
 		toggle_tired_sway = gi.cvar("sv_toggle_tired_sway", "0", 0);
 	else
 		toggle_tired_sway = gi.cvar("sv_toggle_tired_sway", "1", 0);
 	
+	if (chile->value) // ZeRo - If Chile is enabled, allow_medic_pickup is enabled by default. But it still can be disabled by the server operator if wanted.
+		allow_medic_pickup = gi.cvar("allow_medic_pickup", "1", 0);
+	else
+		allow_medic_pickup = gi.cvar("allow_medic_pickup", "0", 0);
 	
-	allow_medic_pickup = gi.cvar("allow_medic_pickup", "0", 0);
-	
+	if (chile->value) // ZeRo - If Chile is enabled, extra_anims is disabled by default. But it still can be enabled by the server operator if wanted.
+		extra_anims = gi.cvar("extra_anims", "0", 0);
+	else
+		extra_anims = gi.cvar("extra_anims", "1", 0);	
 
 	knifefest = gi.cvar("knifefest", "0", 0);
 
