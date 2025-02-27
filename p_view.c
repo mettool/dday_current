@@ -980,8 +980,10 @@ void SV_CalcBlend(edict_t* ent)
 		}*/
 
 	if (ent->client->ps.fov == SCOPE_FOV)
-		SV_AddBlend(0.0, 0.0, 0.25F, .1F, ent->client->ps.blend);//faf:  blue tinge /* MetalGod explicit float */
-//		SV_AddBlend (0.0, 0.0, 0.0, .1, ent->client->ps.blend);
+		if (chile->value)
+			SV_AddBlend (0.0, 0.0, 0.0, .1, ent->client->ps.blend); // No blue tinge on DDay Chile - ZeRo
+		else
+			SV_AddBlend(0.0, 0.0, 0.25F, .1F, ent->client->ps.blend);//faf:  blue tinge /* MetalGod explicit float */
 //		SV_AddBlend (0.0, 0.0, 0.0, .1 + (xyspeed/1000), ent->client->ps.blend);
 		//end faf
 }
@@ -2496,16 +2498,17 @@ void ClientEndServerFrame(edict_t* ent)
 	// Do Jump-Stamina increase
 	if (ent->client->jump_stamina < JUMP_MAX)
 	{
-		if (!ent->client->movement)
-			ent->client->jump_stamina += JUMP_REGEN * 6.5F;
-		else if (ent->client->jump_stamina > 60)
-			ent->client->jump_stamina += JUMP_REGEN * 2;
-		else
-			ent->client->jump_stamina += JUMP_REGEN;
+	
+			if (!ent->client->movement)
+				ent->client->jump_stamina += JUMP_REGEN * (chile->value ? 12 : 6.5F);
+			else if (ent->client->jump_stamina > (chile->value ? 50 : 60))
+				ent->client->jump_stamina += JUMP_REGEN * (chile->value ? 10 : 2);
+			else
+				ent->client->jump_stamina += JUMP_REGEN * (chile->value ? 8 : 1);
 
-		if (ent->ai)
-			ent->client->jump_stamina += JUMP_REGEN * 6.5F; /* MetalGod explicit float */
-	}
+			if (ent->ai)
+				ent->client->jump_stamina += JUMP_REGEN * (chile->value ? 12 : 6.5F); /* MetalGod explicit float */
+		}
 
 	if (ent->client->resp.chatsave[0] != '\0' && ent->client->resp.chatsavetime + 5 < level.framenum)
 		Cmd_Say_f(ent, ent->client->resp.chatsavetype, false, true);

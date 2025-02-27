@@ -1609,6 +1609,15 @@ void SP_worldspawn(edict_t * ent)
 	gi.soundindex("weapons/gundrop.wav");
 	gi.soundindex("weapons/ammodrop.wav");
 
+	// ZeRo - Sonidos del sistema de rachas.
+if (exbattleinfo->value > 2)
+{
+	gi.soundindex("streak/killingspree.wav");
+    gi.soundindex("streak/rampage.wav");
+    gi.soundindex("streak/dominating.wav");
+    gi.soundindex("streak/unstopable.wav");
+    gi.soundindex("streak/godlike.wav");
+}
 	gi.soundindex("player/breathe.wav"); //faf
 
 	sm_meat_index = gi.modelindex("models/objects/gibs/sm_meat/tris.md2");

@@ -46,6 +46,102 @@ void Drop_Weapon(edict_t* ent, gitem_t* item);
 void weapon_grenade_fire(edict_t* ent);
 void check_unscope(edict_t* ent);//faf
 
+/* ZeRo - KILLING SPREE! - Sistema de rachas 
+Funcionamiento: 
+Se controla con la cvar "exbattleinfo". Con un valor de 0 el sistema de rachas esta desactivado.
+Con un valor de 1 se activa el anuncio de los headshots y las salvadas con casco a todos los jugadores
+Con un valor de 3 o superior se activa el anuncio de rachas. Ademas este valor determina la cantidad de frags seguidos necesarios para iniciar una racha.
+Ej: "set exbattleinfo 5" activa las rachas a partir de 5 frags seguidos.
+Luego, se anuncian mas metas cada 3 frags adicionales. Al llegar a la meta maxima, todos los frags siguientes son anunciados.
+Cada meta tiene un sonido asociado que se guarda en ""./sound/streak/".
+Cuando el jugador en racha es eliminado, el jugador que lo elimino tambien es anunciado.
+Si el jugador se suicida, comete un team kill o se cambia de equipo, la racha termina y el fin se anuncia.
+*/
+
+void AnnounceStreak(char *streakmsg, edict_t *Tent) // Funcion secundaria para generar los mensajes.
+{
+	int i;
+	for (i = 1; i <= game.maxclients; i++)
+	{
+		Tent = &g_edicts[i];
+		if (!Tent->inuse || !Tent->client)
+			continue;
+		safe_cprintf (Tent, PRINT_MEDIUM, "%s \n", streakmsg);
+	}
+}
+
+void KillingSpree(edict_t *attacker, edict_t *self, edict_t *Tent) // Funcion principal
+{
+	char streakmsg[128];
+	
+	if (OnSameTeam(attacker, self) && attacker && attacker->client && attacker != self) // La racha se pierde si se comete un asesinato por fiendly fire.
+	{
+		if (attacker->client->resp.streak >= exbattleinfo->value)
+		{
+			Com_sprintf(streakmsg, sizeof(streakmsg), "** %s has LOST his streak due to FRIENDLY FIRE. **", attacker->client->pers.netname);
+			AnnounceStreak (streakmsg, Tent);
+		}
+		attacker->client->resp.streak = 0;
+	}
+
+	else if (attacker && attacker->client && attacker != self)
+		attacker->client->resp.streak++;
+
+	if (attacker && attacker->client && attacker->client->resp.streak >= exbattleinfo->value && attacker != self) // Si el jugador está en racha se genera el anuncio.
+		{
+			switch ((int)attacker->client->resp.streak - (int)exbattleinfo->value) // Los anuncios y sonidos aparecen al entrar en racha y luego cada 3 frags.
+    		{
+        		case 0:
+					gi.positioned_sound(vec3_origin, &g_edicts[0], CHAN_AUTO, gi.soundindex("streak/killingspree.wav"), 1, ATTN_NONE, 0);
+    				Com_sprintf(streakmsg, sizeof(streakmsg), "** %s is on a KILLING SPREE!: %d frags **", attacker->client->pers.netname, attacker->client->resp.streak);
+					AnnounceStreak (streakmsg, Tent);
+            		break;
+	        	case 3:
+					gi.positioned_sound(vec3_origin, &g_edicts[0], CHAN_AUTO, gi.soundindex("streak/rampage.wav"), 1, ATTN_NONE, 0);
+    				Com_sprintf(streakmsg, sizeof(streakmsg), "** %s is on a RAMPAGE!: %d frags **", attacker->client->pers.netname, attacker->client->resp.streak);
+					AnnounceStreak (streakmsg, Tent);
+        	    	break;
+        		case 6:
+					gi.positioned_sound(vec3_origin, &g_edicts[0], CHAN_AUTO, gi.soundindex("streak/dominating.wav"), 1, ATTN_NONE, 0);
+    				Com_sprintf(streakmsg, sizeof(streakmsg), "** %s is DOMINATING!: %d frags **", attacker->client->pers.netname, attacker->client->resp.streak);
+					AnnounceStreak (streakmsg, Tent);
+    	        	break;
+        		case 9:
+					gi.positioned_sound(vec3_origin, &g_edicts[0], CHAN_AUTO, gi.soundindex("streak/unstopable.wav"), 1, ATTN_NONE, 0);
+    				Com_sprintf(streakmsg, sizeof(streakmsg), "** %s is UNSTOPABLE!: %d frags **", attacker->client->pers.netname, attacker->client->resp.streak);
+					AnnounceStreak (streakmsg, Tent);
+	            	break;
+				case 12:
+					gi.positioned_sound(vec3_origin, &g_edicts[0], CHAN_AUTO, gi.soundindex("streak/godlike.wav"), 1, ATTN_NONE, 0);
+    				Com_sprintf(streakmsg, sizeof(streakmsg), "** %s is GODLIKE!: %d frags **", attacker->client->pers.netname, attacker->client->resp.streak);
+					AnnounceStreak (streakmsg, Tent);
+	            	break;
+    	    	default:
+					if ((int)attacker->client->resp.streak - (int)exbattleinfo->value >= 13)
+					{
+						Com_sprintf(streakmsg, sizeof(streakmsg), "** %s is GODLIKE!: %d frags **", attacker->client->pers.netname, attacker->client->resp.streak);
+						AnnounceStreak (streakmsg, Tent);
+					}
+					break;
+    		}
+		}
+	
+	if (self->client->resp.streak >= exbattleinfo->value && attacker->client && attacker != self) // Si el jugador está en racha y es asesinado, quien corta la racha es anunciado.
+	{
+		Com_sprintf(streakmsg, sizeof(streakmsg), "** %s has ENDED %s streak. Total frags: %d **", attacker->client->pers.netname, self->client->pers.netname, self->client->resp.streak);
+		AnnounceStreak (streakmsg, Tent);
+	}
+
+	if (self->client->resp.streak >= exbattleinfo->value && (!attacker || !attacker->client || attacker == self)) // Si el jugador está en racha y cambia de equipo 0 se suicida se anuncia su error :P
+	{
+		Com_sprintf(streakmsg, sizeof(streakmsg), "** %s has made a mistake and LOST his streak. **", self->client->pers.netname);
+		AnnounceStreak (streakmsg, Tent);
+	}
+	
+	self->client->resp.streak = 0; // La racha se reinicia si el jugador muere.
+	
+}
+
 //
 // Gross, ugly, disgustuing hack section
 //
@@ -597,6 +693,8 @@ void ClientObituary(edict_t* self, edict_t* inflictor, edict_t* attacker)
 				self->client->resp.score--;
 			if (!self->ai)
 				self->enemy = NULL;
+			if (exbattleinfo->value > 2)
+				KillingSpree(attacker, self, Tent); // ZeRo - Llamada a la función de racha
 			return;
 		}
 
@@ -770,6 +868,8 @@ void ClientObituary(edict_t* self, edict_t* inflictor, edict_t* attacker)
 					}
 				}
 			}
+			else if (self->client->resp.deathblend == 1 && exbattleinfo->value >= 1) // ZeRo - Los headshots son anunciados a todos (excepto los headshot de teamkill)
+				message3 = " - ** HEADSHOT **";
 			else
 			{
 				message3 = "";
@@ -869,6 +969,8 @@ void ClientObituary(edict_t* self, edict_t* inflictor, edict_t* attacker)
 					else
 						attacker->client->resp.score++;
 				}
+				if (exbattleinfo->value > 2)
+					KillingSpree(attacker, self, Tent); // ZeRo - Llamada a la función de racha
 				return;
 			}
 		}

@@ -937,9 +937,16 @@ void T_Damage(edict_t* targ, edict_t* inflictor, edict_t* attacker, vec3_t dir, 
 		}
 
 		//Wheaty: Per Darwin's request... SMG/LMG can no longer inflict headshots
-		if ((mod == MOD_LMG || mod == MOD_SHOTGUN2 || mod == MOD_SUBMG) && result == HEAD_WOUND)
+		if (chile->value) // In DDay Chile we still can inflict headshots with SMG/LMG but only when target healt is less than 30.
+		{
+			if ((mod == MOD_LMG || mod == MOD_SHOTGUN2 || mod == MOD_SUBMG) && result == HEAD_WOUND && targ->health > 30 )
+				result = CHEST_WOUND;
+		}
+		else
+		{
+			if ((mod == MOD_LMG || mod == MOD_SHOTGUN2 || mod == MOD_SUBMG) && result == HEAD_WOUND)
 			result = CHEST_WOUND;
-
+		}
 		if (targ->deadflag)
 			result = CHEST_WOUND;
 
@@ -1035,7 +1042,10 @@ void T_Damage(edict_t* targ, edict_t* inflictor, edict_t* attacker, vec3_t dir, 
 						vec3_t s_up = { 0.0,0.0,3.0 };
 
 						gi.sound(targ, CHAN_BODY, gi.soundindex("misc/hithelm.wav"), 1, ATTN_NORM, 0);
-						safe_cprintf(targ, PRINT_HIGH, "You lucky bastard! Your helmet deflected the shot!\n");
+						if (exbattleinfo->value >= 1)
+							safe_bprintf(PRINT_MEDIUM,"** %s is a lucky bastard! The helmet deflected the shot!!! **\n",targ->client->pers.netname); // ZeRo - Esto lo muestra a todos (incluso en la consola, quiero cambiar eso.)
+						else
+							safe_cprintf(targ, PRINT_HIGH, "You lucky bastard! Your helmet deflected the shot!\n");
 						damage = 0;
 						targ->client->kick_angles[0] += 3;
 						targ->client->kick_angles[1] -= 3;

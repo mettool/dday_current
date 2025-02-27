@@ -714,6 +714,7 @@ extern cvar_t* objective_protect;
 
 extern cvar_t* ent_files;
 
+extern cvar_t* exbattleinfo; // ZeRo - Activa datos de batalla adicionales: headshots, helmet saves y killing spree. Valores sobre 2 determinan las kills necesarias para la racha.
 extern cvar_t* sniper_only;
 extern cvar_t* mauser_only;
 extern cvar_t* swords;
@@ -1320,6 +1321,7 @@ typedef struct
 	int			stat_castrations;
 	int			stat_helmets;
 	int			stat_fists;
+	int			streak; // ZeRo - Variable usada en el sistema de rachas.
 } client_respawn_t;
 
 typedef struct
@@ -1850,10 +1852,11 @@ int ita_index;
 int jpn_index;
 int usm_index;
 
-#define SMG_SPREAD 50//faf: raise a hair 40
-#define PISTOL_SPREAD 50
-#define LMG_SPREAD 80
-#define HMG_SPREAD 100
+// Values for Dday Chile : Default Values - ZeRo
+#define SMG_SPREAD (chile->value ? 30 : 50)
+#define PISTOL_SPREAD (chile->value ? 40 : 50)
+#define LMG_SPREAD (chile->value ? 20 : 80)
+#define HMG_SPREAD (chile->value ? 10 : 100)
 
 //JABot[start]
 #define WEAP_BLASTER			1

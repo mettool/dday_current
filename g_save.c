@@ -336,6 +336,7 @@ void InitGame(void)
 	objective_protect = gi.cvar("objective_protect", "1", 0);
 	ent_files = gi.cvar("ent_files", "1", 0);
 
+	exbattleinfo =  gi.cvar ("exbattleinfo", "0", 0); // ZeRo
 	mauser_only = gi.cvar("mauser_only", "0", 0);
 	swords = gi.cvar("swords", "0", 0);
 	sniper_only = gi.cvar("sniper_only", "0", 0);
@@ -350,8 +351,14 @@ void InitGame(void)
 
 	fast_knife = gi.cvar("fast_knife", "0", 0);
 
-	chile = gi.cvar("chile", "0", CVAR_LATCH);
-	toggle_tired_sway = gi.cvar("sv_toggle_tired_sway", "1", 0);
+	chile = gi.cvar("chile", "1", CVAR_LATCH);
+	
+	if (chile->value) // ZeRo - If Chile is enabled, disable tired sway by default. But it still can be enabled by the server operator if wanted.
+		toggle_tired_sway = gi.cvar("sv_toggle_tired_sway", "0", 0);
+	else
+		toggle_tired_sway = gi.cvar("sv_toggle_tired_sway", "1", 0);
+	
+	
 	allow_medic_pickup = gi.cvar("allow_medic_pickup", "0", 0);
 	
 

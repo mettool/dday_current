@@ -899,8 +899,17 @@ void weapon_grenade_fire(edict_t* ent)
 	}
 
 	//InFerNo: Long throw set as default
-	if (!ent->client->aim)
-		speed *= 1.4;
+	// DDay Chile: Short throw set as default - ZeRo
+	if (chile->value)
+	{
+		if (ent->client->aim)
+			speed *= 1.4;
+	}
+	else
+	{
+		if (!ent->client->aim)
+			speed *= 1.4;	
+	}
 
 	ent->client->aim = false;
 
@@ -929,9 +938,10 @@ void weapon_grenade_prime(edict_t* ent, int team)
 
 	edict_t* grenade;
 
-	damage = 255;
+	// More mortal grenades on DDay Chile - ZeRo
+	damage = (chile->value ? 300 : 255);
 	timer = level.time + GRENADE_TIMER + abs((int)random());
-	radius = damage + 40;
+	radius = damage + (chile->value ? 80 : 40);
 
 	grenade = G_Spawn();
 

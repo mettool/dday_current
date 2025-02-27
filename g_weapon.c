@@ -2218,7 +2218,7 @@ void fire_gun(edict_t* self, vec3_t start, vec3_t aimdir, int damage, int kick, 
 			VectorMA (end, (self->client->explosion_angles[PITCH]) * (-143), up, end);
 	}*/
 
-	if (self->client->jump_stamina < 60 && self->client->pers.weapon->position == LOC_SNIPER)
+	if (!chile->value && self->client->jump_stamina < 60 && self->client->pers.weapon->position == LOC_SNIPER) // In DDay Chile there is no spread for sniper with low stamina - ZeRo
 	{
 		hspread += 200;
 		vspread += 200;
@@ -3013,10 +3013,10 @@ void Weapon_LMG_Fire(edict_t* ent)
 
 	if (level.framenum % 3 == 0)
 	{
-		if (ent->client->aim)
-			ent->client->kick_angles[0] -= 1.5;
+		if (ent->client->aim) // Less kick on DDay Chile - ZeRo
+			ent->client->kick_angles[0] -= (chile->value ? .5 : 1.5);
 		else
-			ent->client->kick_angles[0] = -3;
+			ent->client->kick_angles[0] = (chile->value ? -.5 : -3);
 	}
 
 	if (!ent->client->aim)
@@ -3052,6 +3052,7 @@ void Weapon_LMG_Fire(edict_t* ent)
 	}
 
 	// pbowens: for darwin's 3.2 kick
+	if (!chile->value) // Don't raise the LMG on DDay Chile - ZeRo
 	ent->client->kick_angles[0] = ent->client->machinegun_shots * -1;
 
 	// get start / end positions

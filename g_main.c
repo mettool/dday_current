@@ -113,6 +113,7 @@ cvar_t* axis_password;
 cvar_t* objective_protect;
 cvar_t* ent_files;
 
+cvar_t* exbattleinfo; // ZeRo
 cvar_t* mauser_only;  //ddaylife
 cvar_t* sniper_only;  //ddaylife
 cvar_t* no_nades; //ddaylife

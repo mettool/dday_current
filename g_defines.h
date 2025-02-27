@@ -157,7 +157,7 @@ implemented it yet? */
 #define CMD_DELAY			2	// seconds
 
 // #define JUMP_TH				60  faf:  renaming this to jump_minimum for clarity
-#define JUMP_MINIMUM		60
+#define JUMP_MINIMUM		(chile->value ? 50 : 60) // DDay Chile value : Default value - ZeRo
 #define JUMP_TAKE			20
 #define JUMP_MAX			100
 #define JUMP_REGEN			0.09F  /* MetalGod explicit float */
