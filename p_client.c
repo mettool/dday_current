@@ -4383,7 +4383,7 @@ void Write_Player_Stats(edict_t* ent)
 	int castrations = 0;
 	int helmets = 0;
 	int fists = 0;
-	char* chat;
+    char* chat = NULL;
 
 	char	filename[MAX_QPATH] = "";
 
@@ -4610,11 +4610,7 @@ void Write_Player_Stats(edict_t* ent)
 
 	fclose(fn);
 
-	if (f)
-	{
-		free(f);
-		f = NULL;
-	}
+
 }
 
 //writes players stat average from .stat file to pers
@@ -4625,7 +4621,7 @@ void SetPlayerRating(edict_t* ent)
 
 	char* s, * f;
 
-	char* statsc;
+    char* statsc = NULL;
 
 	char* name;
 	/* float ratio = 0.0;  MetalGod initialized but not referenced */
@@ -4696,6 +4692,11 @@ void SetPlayerRating(edict_t* ent)
 		if (s != NULL) {
 			chat = s;
 			s = strtok(NULL, "\n");
+		}
+		if (f) //Ddaychile  se cambio de lugar este if para evitar el error al desconectar un player
+		{
+			free(f);
+			f = NULL;
 		}
 	}
 

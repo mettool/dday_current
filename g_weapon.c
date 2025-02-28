@@ -3800,7 +3800,7 @@ void Weapon_Sniper_Fire(edict_t* ent)
 	if (ent->client->aim)
 		VectorSet(offset, 0, 0, ent->viewheight);
 	else
-		VectorSet(offset, 0, 0, ent->viewheight - 8);
+		VectorSet(offset, 0, 0, ent->viewheight);// DdayChile hAnS!! ent->viewheight - 8
 
 	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
 
@@ -3818,7 +3818,7 @@ void Weapon_Sniper_Fire(edict_t* ent)
 		}
 	}
 	else
-		fire_gun(ent, start, forward, damage, kick, 100, 100, mod, false);
+		fire_gun(ent, start, forward, damage, kick, 40, 40, mod, false);//DdayChile hAnS!! 100,100
 
 	ent->client->sniper_loaded[ent->client->resp.team_on->index] = false;
 	// rezmoth - cosmetic recoil
