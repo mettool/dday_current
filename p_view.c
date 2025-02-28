@@ -666,7 +666,7 @@ void SV_CalcGunOffset(edict_t* ent)
 	//stops binocular aim being messed up
 
 	// gun angles from bobbing
-	ent->client->ps.gunangles[ROLL] = xyspeed * bobfracsin * 0.005;
+	ent->client->ps.gunangles[ROLL] = xyspeed * bobfracsin * 0.001;//DdayChile hAnS!! 0.005
 	ent->client->ps.gunangles[YAW] = xyspeed * bobfracsin * 0.01;
 	if (bobcycle & 1)
 	{
@@ -674,7 +674,7 @@ void SV_CalcGunOffset(edict_t* ent)
 		ent->client->ps.gunangles[YAW] = -ent->client->ps.gunangles[YAW];
 	}
 
-	ent->client->ps.gunangles[PITCH] = xyspeed * bobfracsin * 0.005;
+	ent->client->ps.gunangles[PITCH] = xyspeed * bobfracsin * 0.001; //DdayChile hAnS!! 0.005
 
 	ent->client->ps.gunangles[YAW] = ent->client->ps.gunangles[YAW] + ent->client->crosshair_offset_x;
 	ent->client->ps.gunangles[PITCH] = ent->client->ps.gunangles[PITCH] + ent->client->crosshair_offset_y;
@@ -715,18 +715,19 @@ void SV_CalcGunOffset(edict_t* ent)
 		}
 	}
 
-	if (!chile->value && ent->client->last_jump_time > level.time - 3)
+	//DdayChile hAnS!!  esto estaba comentado anteriormente
+
+	/* if (!chile->value && ent->client->last_jump_time > level.time - 3)
 	{
 		if (ent->client->pers.weapon &&
 			ent->client->pers.weapon->classnameb != WEAPON_MP43)
 		{
-			if (4 * (level.time - ent->client->last_jump_time) < (3.1416F))/* MetalGod Make sure this is explicitly a float!*/
-			{
+			if (4 * (level.time - ent->client->last_jump_time) < (3.1416F))			{
 				ent->client->ps.gunangles[PITCH] =
-					ent->client->ps.gunangles[PITCH] - 8 * (sinf(4 * (level.time - ent->client->last_jump_time))); /* MetalGod use the float version of sin (sinf) No need for float precision !*/
+					ent->client->ps.gunangles[PITCH] - 8 * (sinf(4 * (level.time - ent->client->last_jump_time))); 
 			}
 		}
-	}
+	}*/
 
 	/*  make this a model change later
 	//faf:  mauser tweak
@@ -981,9 +982,9 @@ void SV_CalcBlend(edict_t* ent)
 
 	if (ent->client->ps.fov == SCOPE_FOV)
 		if (chile->value)
-			SV_AddBlend (0.0, 0.0, 0.0, .1, ent->client->ps.blend); // No blue tinge on DDay Chile - ZeRo
+			SV_AddBlend (0.0, 0.0, 0.0F, .1F, ent->client->ps.blend); // No blue tinge on DDay Chile - ZeRo
 		else
-			SV_AddBlend(0.0, 0.0, 0.25F, .1F, ent->client->ps.blend);//faf:  blue tinge /* MetalGod explicit float */
+			SV_AddBlend(0.0, 0.0, 0.0F, .1F, ent->client->ps.blend);//faf:  blue tinge /* MetalGod explicit float */
 //		SV_AddBlend (0.0, 0.0, 0.0, .1 + (xyspeed/1000), ent->client->ps.blend);
 		//end faf
 }
@@ -2409,15 +2410,15 @@ void ClientEndServerFrame(edict_t* ent)
 		bobmove = 0;
 		current_client->bobtime = 0;	// start at beginning of cycle again
 	}
-	else if (ent->groundentity)
-	{	// so bobbing only cycles when on ground
-		if (xyspeed > 210)
-			bobmove = 0.25;
-		else if (xyspeed > 100)
-			bobmove = 0.125;
-		else
-			bobmove = 0.0625;
-	}
+    else if (ent->groundentity)
+    {	// so bobbing only cycles when on ground
+    if (xyspeed > 210)  
+    bobmove = chile->value == 1 ? 0.1 : 0.25; //DdayChile hAnS!! 0.25
+    else if (xyspeed > 100)
+    bobmove = chile->value == 1 ? 0.1 : 0.125; //DdayChile hAnS!! 0.125
+    else
+    bobmove = chile->value == 1 ? 0.1 : 0.0625; //DdayChile hAnS!! 0.0625
+    }
 
 	bobtime = (current_client->bobtime += bobmove);
 
